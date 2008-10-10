@@ -19,32 +19,30 @@ Which starting number, under one million, produces the longest chain?
 NOTE: Once the chain starts the terms are allowed to go above one million.
 -}
 
-import Data.List
-import Data.Ord (comparing)
+-- this program doesn't run under runghc - it hits a stack overflow
+-- but it works fine when compiled
+
+import Data.Array
 import Control.Arrow ((&&&))
-import Data.Function (on)
-import qualified Data.Map as Map
-import Control.Monad.State.Strict
-import Control.Monad (liftM)
+import Data.Ord (comparing)
+import Data.List (maximumBy)
 
-type ChainState = State (Map.Map Integer [Integer])
+limit = 999999
 
-runChainState :: ChainState a -> a
-runChainState cs = evalState cs $ Map.singleton 1 [1]
+memo = array bounds [(i,chain' i) | i <- range bounds]
+  where bounds = (1, limit)
 
-chain :: Integer -> ChainState [Integer]
-chain n = do
-    map <- get
-    case Map.lookup n map of
-      Nothing -> do
-            ns <- chain' n
-            modify $ Map.insert n ns
-            return ns
-      Just ns -> return ns
-  where chain' n
-            | even n    = liftM (n:) $ chain $ n `div` 2
-            | otherwise = liftM (n:) $ chain $ 3*n + 1
+chain :: Integer -> Integer
+chain n
+    | inRange (bounds memo) n = memo ! n
+    | otherwise = chain' n
+
+chain' :: Integer -> Integer
+chain' 1 = 1
+chain' n
+    | even n    = let n' = n `div` 2 in succ (chain n')
+    | otherwise = let n' = 3*n+1 in succ (chain n')
 
 main = do
-  let chains = sequence $ map chain [1..999999]
-  print $ head $ snd $ maximumBy (comparing fst) $ map (length &&& id) $ runChainState chains
+  let chains = map (id &&& chain) [1..limit]
+  print $ fst $ maximumBy (comparing snd) $ chains
