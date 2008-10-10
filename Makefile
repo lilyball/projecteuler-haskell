@@ -5,7 +5,7 @@ default:
 %: %.hs
 	ghc --make -O2 $<
 	@echo ./$@
-	@trap 'rm $@ $@.hi $@.o' EXIT && (if [[ x$TIMED = x ]]; then ./$@; else time ./$@; fi)
+	@trap 'rm $@ $@.hi $@.o' EXIT && (if [[ -z "$$TIMED" ]]; then ./$@; else time ./$@; fi)
 
 clean:
 	rm -rf *.o *.hi *~
