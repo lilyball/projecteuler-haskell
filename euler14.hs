@@ -19,7 +19,9 @@ Which starting number, under one million, produces the longest chain?
 NOTE: Once the chain starts the terms are allowed to go above one million.
 -}
 
-import Data.List (sortBy)
+import Data.List
+import Data.Ord (comparing)
+import Control.Arrow ((&&&))
 import Data.Function (on)
 import qualified Data.Map as Map
 import Control.Monad.State.Strict
@@ -36,7 +38,7 @@ chain n = do
     case Map.lookup n map of
       Nothing -> do
             ns <- chain' n
-            put $ Map.insert n ns map
+            modify $ Map.insert n ns
             return ns
       Just ns -> return ns
   where chain' n
@@ -45,4 +47,4 @@ chain n = do
 
 main = do
   let chains = sequence $ map chain [1..999999]
-  print $ head $ head $ sortBy (flip compare `on` length) $ runChainState chains
+  print $ head $ snd $ maximumBy (comparing fst) $ map (length &&& id) $ runChainState chains
