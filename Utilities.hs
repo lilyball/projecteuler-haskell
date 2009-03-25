@@ -7,6 +7,8 @@ module Utilities
       primeFactors
     , divisors
     , divisorPairs
+    , perms
+    , permsN
     ) where
 
 import qualified Sieve
@@ -38,3 +40,21 @@ divisors n = Set.toList $ divisors' $ primeFactors n
 --   multiplicand/multiplier in order sorted by the first element of the pair
 divisorPairs :: Integer -> [(Integer, Integer)]
 divisorPairs n = takeWhile (uncurry (<=)) $ map (id &&& (n `div`)) $ divisors n
+
+-- | Returns all permutations of the input list.
+--   Taken from http://www.haskell.org/pipermail/haskell/2006-July/018298.html
+--   (with some modifications to make it work)
+perms :: [a] -> [[a]]
+perms []  = [[]]
+perms [a] = [[a]]
+perms xs  = [y : ps | (y,ys) <- selections xs, ps <- perms ys]
+selections []     = []
+selections [x]    = [(x,[])]
+selections (x:xs) = (x,xs) : [(y,x:ys) | (y,ys) <- selections xs]
+
+-- | @permsN n xs@ returns all permutations of length @n@ from @xs@
+permsN :: Int -> [a] -> [[a]]
+permsN _ [] = [[]]
+permsN 0 _  = []
+permsN 1 xs = map (:[]) xs
+permsN n xs = [y : ps | (y,ys) <- selections xs, ps <- permsN (pred n) ys]
