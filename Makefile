@@ -2,7 +2,7 @@ default:
 	@echo "You must specify a problem to run"
 	@exit 1
 
-RTS = +RTS -M512m
+#RTS = +RTS -M512m
 
 %: %.hs
 	ghc --make -O2 $<
