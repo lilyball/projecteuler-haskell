@@ -1,12 +1,15 @@
-.PHONY: clean distclean
+default:
+	@echo "You must specify a problem to run"
+	@exit 1
 
-SOURCES = $(wildcard *.hs)
+RTS = +RTS -M512m
 
-prob%: prob%.hs
+%: %.hs
 	ghc --make -O2 $<
+	@echo ./$@
+	@trap 'rm $@ $@.hi $@.o' EXIT && (if [[ -z "$$TIMED" ]]; then ./$@ $(RTS); else time ./$@ $(RTS); fi)
 
 clean:
-	rm -f *.o *.hi
+	rm -rf *.o *.hi *~
 
-distclean: clean
-	rm -f ${SOURCES:.hs=}
+.PHONY: clean
