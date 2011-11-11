@@ -1,0 +1,4 @@
+Turns out this commit is faulty. The rewriting isn't actually bubbling
+properly. When processing a given node, it processes both child nodes,
+but the nodes get re-processed when the sibling of the current node
+is processed.
