@@ -3,11 +3,13 @@
 module Triangle where
 
 type Triangle a = TriCell a -- root cell
-data TriCell a = TriCell {
-                   triValue :: a
-                 , triLeft :: TriCell a
-                 , triRight :: TriCell a
-                 } | TriNull deriving (Show, Eq)
+data TriCell a = TriCell a (TriCell a) (TriCell a)
+               | TriNull
+                 deriving (Show, Eq)
+
+triValue (TriCell a _ _) = a
+triLeft  (TriCell _ l _) = l
+triRight (TriCell _ _ r) = r
 
 instance Functor TriCell where
   fmap f (TriCell a left right) = TriCell (f a) (fmap f left) (fmap f right)
@@ -35,16 +37,22 @@ sampleTriangle = buildTriangle [[3],[7,4],[2,4,6],[8,5,9,3]]
 -- and the value of the right branch, and spits out the new cell value.
 -- The seed value is used in place of values for TriNull cells.
 bubbleBy :: (a -> b -> b -> b) -> b -> Triangle a -> Triangle b
-bubbleBy f seed TriNull = TriNull
-bubbleBy f seed (TriCell a left right) = TriCell (f a leftVal rightVal) left' right'
-  where left' = bubbleBy f seed left
-        leftVal = case left' of
-                    TriNull -> seed
-                    (TriCell a _ _) -> a
-        right' = bubbleBy f seed right
-        rightVal = case right' of
-                     TriNull -> seed
-                     (TriCell a _ _) -> a
+bubbleBy _ _ TriNull = TriNull
+bubbleBy f seed tri = buildTriangle $ applyFunction rows
+  where rows = [tri] : rows' (head rows)
+        rows' ((TriCell _ TriNull _):_) = []
+        rows' tss@(t:ts) = curRow : rows' curRow
+          where curRow = triLeft t : map triRight tss
+        applyFunction (as:[]) = [applySeed as]
+          where applySeed [] = []
+                applySeed (TriNull:_) = []
+                applySeed (TriCell t _ _:ts) = f t seed seed : applySeed ts
+        applyFunction (as:ass) = processRow as ass' : rest
+          where rest = applyFunction ass
+                ass' = head rest ++ repeat seed
+                processRow [] _ = []
+                processRow (TriNull:_) _ = []
+                processRow (TriCell t _ _:ts) (a:as@(a':_)) = f t a a' : processRow ts as
 
 -- example bubble that produces the maximum value of a route from top to bottom
 bubbleMax :: (Num a, Ord a) => Triangle a -> Triangle a
