@@ -34,47 +34,7 @@
 -- and requires a clever method! ;o)
 --
 
--- Let's try brute force here anyway, we can get the efficient version when we do prob 67
-
-{------ Triangle ------}
-
-type Triangle a = TriCell a -- root cell
-data TriCell a = TriCell a (TriCell a) (TriCell a) | TriNull deriving (Show)
-
-instance Functor TriCell where
-  fmap f (TriCell a left right) = TriCell (f a) (fmap f left) (fmap f right)
-  fmap f TriNull                = TriNull
-
-buildTriangle :: [[a]] -> Triangle a
-buildTriangle [] = TriNull
-buildTriangle rows = head $ build 1 rows
-  where build :: Int -> [[a]] -> [TriCell a]
-        build min [] = replicate min TriNull
-        build min (nums:lines) = cells ++ replicate (min - length cells) TriNull
-          where cells = build' nums nextRow
-                build' :: [a] -> [TriCell a] -> [TriCell a]
-                build' [] _ = []
-                build' (num:nums) (left:right:next) = TriCell num left right : build' nums (right:next)
-                -- nextRow :: [TriCell a]
-                -- Can't actually give it this type
-                nextRow = build (succ $ length nums) lines
-
-sampleTriangle :: Triangle Int
-sampleTriangle = buildTriangle [[3],[7,4],[2,4,6],[8,5,9,3]]
-
-{------ Pathfinding ------}
-
-routes :: Triangle a -> [[TriCell a]]
-routes TriNull = []
-routes cell@(TriCell _ left right) = if null routes' then [[cell]] else routes'
-  where routes' = [cell : route | route <- routes left ++ routes right]
-
-sumRoute :: Num a => [TriCell a] -> a
-sumRoute = sum . map cellValue
-  where cellValue TriNull = 0
-        cellValue (TriCell i _ _) = i
-
-{------ IO ------}
+import Triangle
 
 parseFile :: IO [[Int]]
 parseFile = return . map (map read . words) . lines =<< readFile "prob18.txt"
@@ -82,4 +42,4 @@ parseFile = return . map (map read . words) . lines =<< readFile "prob18.txt"
 main = do
   lines <- parseFile
   let triangle = buildTriangle lines
-  print $ maximum $ map sumRoute $ routes triangle
+  print $ triValue $ bubbleMax triangle
