@@ -1,4 +1,4 @@
-{-# OPTIONS_GHC -XRankNTypes -XScopedTypeVariables #-}
+{-# LANGUAGE RankNTypes,ScopedTypeVariables #-}
 -- triangle support for prob18 and prob67
 
 module Triangle where
