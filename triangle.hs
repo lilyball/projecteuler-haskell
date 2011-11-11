@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -XRankNTypes -XScopedTypeVariables #-}
 -- triangle support for prob18 and prob67
 
 module Triangle where
@@ -36,20 +37,26 @@ sampleTriangle = buildTriangle [[3],[7,4],[2,4,6],[8,5,9,3]]
 -- The given function takes the value of the cell, the value of the left branch,
 -- and the value of the right branch, and spits out the new cell value.
 -- The seed value is used in place of values for TriNull cells.
-bubbleBy :: (a -> b -> b -> b) -> b -> Triangle a -> Triangle b
+bubbleBy :: forall a b. (a -> b -> b -> b) -> b -> Triangle a -> Triangle b
 bubbleBy _ _ TriNull = TriNull
 bubbleBy f seed tri = buildTriangle $ applyFunction rows
-  where rows = [tri] : rows' (head rows)
+  where rows :: [[TriCell a]]
+        rows = [tri] : rows' (head rows)
+        rows' :: [TriCell a] -> [[TriCell a]]
         rows' ((TriCell _ TriNull _):_) = []
         rows' tss@(t:ts) = curRow : rows' curRow
-          where curRow = triLeft t : map triRight tss
+          where curRow :: [TriCell a]
+                curRow = triLeft t : map triRight tss
+        applyFunction :: [[Triangle a]] -> [[b]]
         applyFunction (as:[]) = [applySeed as]
-          where applySeed [] = []
+          where applySeed :: [TriCell a] -> [b]
+                applySeed [] = []
                 applySeed (TriNull:_) = []
                 applySeed (TriCell t _ _:ts) = f t seed seed : applySeed ts
         applyFunction (as:ass) = processRow as ass' : rest
           where rest = applyFunction ass
                 ass' = head rest ++ repeat seed
+                processRow :: [TriCell a] -> [b] -> [b]
                 processRow [] _ = []
                 processRow (TriNull:_) _ = []
                 processRow (TriCell t _ _:ts) (a:as@(a':_)) = f t a a' : processRow ts as
