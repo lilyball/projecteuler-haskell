@@ -20,7 +20,7 @@
 -- efficient algorithm to solve it. ;o)
 --
 
-import Triangle
+import Euler.Triangle
 
 parseFile :: IO [[Int]]
 parseFile = return . map (map read . words) . lines =<< readFile "prob67.txt"

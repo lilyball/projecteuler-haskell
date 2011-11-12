@@ -1,7 +1,7 @@
 {-# LANGUAGE RankNTypes,ScopedTypeVariables #-}
 -- triangle support for prob18 and prob67
 
-module Triangle where
+module Euler.Triangle where
 
 type Triangle a = TriCell a -- root cell
 data TriCell a = TriCell a (TriCell a) (TriCell a)

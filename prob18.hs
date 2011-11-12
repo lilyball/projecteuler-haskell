@@ -34,7 +34,7 @@
 -- and requires a clever method! ;o)
 --
 
-import Triangle
+import Euler.Triangle
 
 parseFile :: IO [[Int]]
 parseFile = return . map (map read . words) . lines =<< readFile "prob18.txt"
