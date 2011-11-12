@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -Wall #-}
 -- Let d(n) be defined as the sum of proper divisors of n (numbers less than n
 -- which divide evenly into n).
 -- If d(a) = b and d(b) = a, where a ≠ b, then a and b are an amicable pair and
@@ -10,39 +11,13 @@
 -- Evaluate the sum of all the amicable numbers under 10000.
 --
 
-import Data.Numbers.Primes
-import Data.List (subsequences, nub)
-import Data.Array
-import Data.Ix
+import Data.Ix (inRange)
 import Control.Monad (guard)
 
-import Test.QuickCheck
-
-divisors :: (Num a, Integral a) => a -> [a]
-divisors = map product . nub . subsequences . primeFactors
-
-properDivisors :: (Num a, Integral a) => a -> [a]
-properDivisors = init . divisors
+import Euler.Divisors
 
 sumOfDivisors :: (Num a, Integral a) => a -> a
 sumOfDivisors = sum . properDivisors
-
------------------
-
-{-divisorAry :: Array Int Int
-divisorAry = array (1,1000) [(i,d) | i <- [1..1000], let d = sumOfDivisors i]
-
-amicablePairs :: [(Int,Int)]
-amicablePairs = do
-  (i,a) <- assocs divisorAry
-  guard $ a > i -- always produce a sorted pair
-  guard $ bounds divisorAry `inRange` a -- is the pair in range?
-  guard $ divisorAry ! a == i -- is it amicable?
-  return (i,a)
-
-amicableNumbers :: [Int]
-amicableNumbers = foldr step [] amicablePairs
-  where step a b = fst a : snd a : b-}
 
 amicableNumbers :: (Int,Int) -> [Int]
 amicableNumbers bounds = do
@@ -52,14 +27,6 @@ amicableNumbers bounds = do
   guard $ sumOfDivisors d == i
   if inRange bounds d then [i,d] else [i]
 
+main :: IO ()
 main = do
   print $ sum $ amicableNumbers (1,10000)
-
------------------
-
-testDivisors = quickCheck test
-  where test :: Int -> Bool
-        test n = all prop pairs
-          where prop = (==n) . uncurry (*)
-                pairs = zip (reverse divs) divs
-                divs = divisors n
