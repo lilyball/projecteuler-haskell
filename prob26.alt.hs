@@ -22,7 +22,7 @@ import Data.Ord (comparing)
 
 -- `remainders n d` returns an infinite list of all the remainders after each
 -- step of long division. This can be turned into digits by using something like
--- `(n*10 `div` d) : map (flip div d) (remainders n d)`.
+-- `(n*10 `div` d) : map (flip div d . (*10)) (remainders n d)`.
 -- This assumes that n < d. If it's not, then the first result will be a bit strange.
 remainders :: Int -> Int -> [Int]
 remainders n d = n' : remainders n' d
