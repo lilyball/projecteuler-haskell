@@ -11,7 +11,6 @@ import Control.Monad
 import Control.Monad.Instances
 import Data.List (maximumBy)
 import Data.Function (on)
-import Data.Array
 
 solutionsForPerimiter :: Int -> [(Int,Int,Int)]
 solutionsForPerimiter p = do
@@ -19,10 +18,9 @@ solutionsForPerimiter p = do
     b <- [a..(p `quot` 2)]
     let c = p-a-b
         ab = a*a + b*b
-    guard (perfectSquares ! c == ab)
+        cc = c*c
+    guard $ cc == ab
     return (a,b,c)
-  where perfectSquares :: Array Int Int
-        perfectSquares = array (1,p) [(i, i*i) | i <- [1..p]]
 
 main :: IO ()
 main = do
