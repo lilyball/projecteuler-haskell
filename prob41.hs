@@ -6,15 +6,14 @@
 --
 
 import Data.Numbers.Primes
-import Data.List ((\\))
-
-isPandigital :: Int -> Bool
-isPandigital d = ds \\ take n (enumFrom '1') == []
-  where ds = show d
-        n = length ds
+import Data.List (permutations)
+import Data.Char (intToDigit)
 
 main = do
-  -- 9 digit pandigitals cannot be prime as sum [1..9] is divisible by 3
-  -- 8 digit pandigitals cannot be prime as sum [1..8] is divisible by 3
-  -- Limit all primes to those 7 digits and fewer
-  print $ maximum $ filter isPandigital $ takeWhile (<=7654321) primes
+    print $ maximum $ filter isPrime list
+  -- 9-digit pandigitals cannot be prime as sum [1..9]=45 is divisible by 3
+  -- 8-digit pandigitals cannot be prime as sum [1..8]=36 is divisible by 3
+  where list = do
+          n <- [1..7]
+          ps <- permutations [1..n]
+          return $ read $ map intToDigit ps
