@@ -13,16 +13,7 @@
 
 import Control.Monad
 import Control.Monad.Instances
-
-pentagonals :: [Int]
-pentagonals = map p [1..]
-  where p n = n*(3*n-1) `quot` 2
-
-isPentagonal :: Int -> Bool
-{-isPentagonal n = elem n $ takeWhile (<=n) pentagonals-}
-isPentagonal p = isIntegral n
-  where n = ((1/2) + sqrt (1/4 + 6*fromIntegral p)) / 3
-        isIntegral = (==0) . snd . properFraction
+import Euler.Numbers
 
 -- pairs of pentagonals who's sum and difference are pentagonal
 pairs :: [(Int,Int)]
