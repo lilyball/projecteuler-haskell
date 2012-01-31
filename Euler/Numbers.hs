@@ -1,9 +1,29 @@
-module Euler.Numbers where
+module Euler.Numbers (
+  isIntegral,
+  numToDigits, digitsToNum,
+  triangles, isTriangle,
+  pentagonals, isPentagonal,
+  hexagonals, isHexagonal
+  ) where
+
+import Data.List (unfoldr)
 
 -- Utility functions
 
 isIntegral :: (RealFrac n) => n -> Bool
 isIntegral = (==0) . snd . properFraction
+
+numToDigits :: (Integral n) => n -> [Int]
+numToDigits 0 = [0]
+numToDigits n
+  | n < 0 = error "numToDigits: negative input"
+  | otherwise = reverse $ unfoldr step n
+  where step 0 = Nothing
+        step n = let (n',d) = n `quotRem` 10
+                 in Just (fromIntegral d, n')
+
+digitsToNum :: (Integral n) => [Int] -> n
+digitsToNum = foldl ((.fromIntegral).(+).(10*)) 0
 
 -- Triangle numbers
 
