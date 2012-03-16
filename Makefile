@@ -11,5 +11,6 @@ RTS = +RTS -M512m
 
 clean:
 	rm -rf *.o *.hi *~
+	rm -rf Euler/*{.o,.hi,~}
 
 .PHONY: clean
